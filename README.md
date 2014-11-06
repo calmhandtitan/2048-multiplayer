@@ -1,27 +1,44 @@
 2048-multiplayer
 ================
 
-added server-client gaming for 2048,original project https://github.com/mevdschee/2048.c
+###Overview
 
-firstly, create the executable linux file on the systems you want to play, with the following command
+Classic 2048 game, with the option to play multiplayer.
 
-> g++ -o 2048.out 2048multiplayer.cpp 
+The multiplayer gaming is implemented using server-client socket programming.
 
-then, on one of them, 
+Original Project: https://github.com/mevdschee/2048.c
 
-> 2048.out server
+###Dependencies
 
-with this (assuming 2048.out is the executable ) , this system will become your 2048 server
+`GNU C++`
 
-(also you should know the IP of this system, which you can get using ifconfig)
+`Linux(Ubuntu) platform preferably 14.04`
 
-on clients,
+###Compilation
 
-> 2048.out client
+To compile, run the following command on terminal
 
-then it will ask you to enter the username, and IP address of server.(which you got from ifconfig)
+> $ g++ -o 2048.out 2048multiplayer.cpp 
 
+###Execution
 
+To play the game in single user mode, simply run
 
+> $ 2048.out
 
+To play in multiplayer mode, first start the *server* using the command:
 
+> $ 2048.out server
+
+Now to play the game, start a client using the command
+
+> $ 2048.out client
+
+This command will ask for a *username*, and hence you are required to enter a valid username.
+
+Next, it will ask the *Server IP/Host* to connect, and you are required to enter a host you want to connect to and start playing the game.
+You can get to know your host by running command
+> $ ifconfig
+
+Alternatively, you can enter 127.0.0.1 to play on localhost.

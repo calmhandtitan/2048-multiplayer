@@ -44,7 +44,7 @@
 
 
 uint32_t score=0;
-uint8_t scheme=0;
+
 char Gserver[100];
 char name[100];
 uint16_t board[SIZE][SIZE];
@@ -74,7 +74,7 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 	char color[40], reset[] = "\033[m";
 	printf("\033[H");
 
-	printf("2048.c %17d pts\n\n",score);
+	printf("2048.cpp %17d pts\n\n",score);
 
 	for (y=0;y<SIZE;y++) {
 		for (x=0;x<SIZE;x++) {
@@ -107,7 +107,7 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 		printf("\n");
 	}
 	printf("\n");
-	printf("        ←,↑,→,↓ or q        \n");
+	printf("        ←,↑,→,↓ or q/r        \n");
 	printf("\033[A");
 }
 
@@ -575,6 +575,8 @@ int main(int argc, char *argv[]) {
 			while (true) {
 			c=getchar();
 				if (c=='y'){
+					score = 0;
+					uploadScore();
 					memset(board,0,sizeof(board));
 					addRandom(board);
 					addRandom(board);
