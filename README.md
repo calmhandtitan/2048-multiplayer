@@ -11,7 +11,7 @@ Original Project: https://github.com/mevdschee/2048.c
 
 ###Dependencies
 
-`GNU C++`
+`GCC 4.7 or above`
 
 `Linux(Ubuntu) platform preferably 14.04`
 
