@@ -4,7 +4,7 @@
 
 
 Platform : 
-C++
+C++ 11
 ubuntu 14.04
 
 Team Members : 
@@ -29,6 +29,7 @@ Requirements :
 4. User accounts should store the records of all games of that user.
 5. Proper registration mechanism(with password recovery question)
 6. Every activity of clients should be written to log with timestamps.
+7. A control/Admin Panel at the server portal to control and configure various options.
 
 Feel free to add to this list. 
 Provide additions and corrections with pull requests.
