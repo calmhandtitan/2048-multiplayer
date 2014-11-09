@@ -19,7 +19,7 @@ Original Project: https://github.com/mevdschee/2048.c
 
 To compile, run the following command on terminal
 
-> $ g++ -o 2048.out 2048multiplayer.cpp 
+> $ g++ -o 2048.out 2048multiplayer.cpp -std=c++11
 
 ###Execution
 
