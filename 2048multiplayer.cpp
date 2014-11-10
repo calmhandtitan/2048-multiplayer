@@ -43,7 +43,7 @@
 #define ANSI_COLOR_MAGENTA "\x1b[35m"
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
-
+ 
 // just choosing a random port 
 #define PORT 31217
 
@@ -389,7 +389,7 @@ void createGameServer()
 		if( usernames.find(nme) != usernames.end())	
 		{
 			if(username_score[nme] && temp_score == 0)
-				printf(ANSI_COLOR_RED	"%s has restarted the game"ANSI_COLOR_RESET "\n",nme);
+				printf(ANSI_COLOR_RED	"%s has restarted the game" ANSI_COLOR_RESET "\n",nme);
 			username_score[nme]  = temp_score;
 			printf("%s attained score of %d\n",nme,temp_score);
 		}
