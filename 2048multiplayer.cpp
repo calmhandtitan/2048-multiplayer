@@ -346,6 +346,7 @@ void displayLeaderBoard()
 	
 	
 	
+	
 	if(username_score.empty() )
 		printf("\t\t\t\t\tNo active users\n");
 
@@ -357,22 +358,22 @@ void displayLeaderBoard()
 	std::reverse(score_board.begin() , score_board.end()) ;
 	//std::reverse(score_board.begin(), score_board.end()) ;
 	int i  =0 ;
-	for(  auto s = score_board.begin() ; s!= score_board.end() and i<10 ; s++)
+	for(  auto s = score_board.begin() ; s!= score_board.end()  ; s++)
 	{
 //		std::cout<<"\t\t\t"<<std::string(20,' ')<<(*s).second << " " << (*s).first << std::endl;
 		printf("\t\t\t%20s\t\t%d\n",(*s).second.c_str(),(*s).first);
 		i++;
 	}
 
-	while(i--)
+	for( ;i<10;i++)
 		printf("\n");
 
 	while( feeds.size() > 10 )
 		feeds.erase(feeds.begin());
 
-
+	printf("\t\t\t\t       LIVE     FEEDS  \n\n");
 	for( auto s : feeds )
-		std::cout << s << std::endl;
+		std::cout <<"\t\t\t\t"<< s << std::endl;
 	
 	
 
@@ -444,7 +445,7 @@ void createGameServer()
 				feeds.push_back(std::string(feed));
 			}
 			username_score[nme]  = temp_score;
-//			printf("%s attained score of %d\n",nme,temp_score);
+			//printf("%s attained score of %d\n",nme,temp_score);
 		}
 		
 			
