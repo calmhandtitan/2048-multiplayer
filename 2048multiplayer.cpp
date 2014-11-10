@@ -35,6 +35,7 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <bits/stdc++.h>
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
@@ -59,7 +60,7 @@ uint16_t board[SIZE][SIZE];
 
 std::set<std::string> usernames;
 std::map<std::string,int> username_score;
-
+std::vector<std::string> feeds;
 
 void getColor(uint16_t value, char *color, size_t length) {
 	uint8_t original[] = {8,255,1,255,2,255,3,255,4,255,5,255,6,255,7,255,9,0,10,0,11,0,12,0,13,0,14,0,255,0,255,0};
@@ -73,6 +74,8 @@ void getColor(uint16_t value, char *color, size_t length) {
 	}
 	snprintf(color,length,"\033[38;5;%d;48;5;%dm",*foreground,*background);
 }
+
+
 
 
 
@@ -334,6 +337,48 @@ void setBufferedInput(bool enable) {
 
 */
 
+void displayLeaderBoard()
+{
+	system("clear");
+
+	
+	printf("\t\t\t\t   2048   CONTEST   LEADERBOARD\n\n");
+	
+	
+	
+	
+	if(username_score.empty() )
+		printf("\t\t\t\t\tNo active users\n");
+
+	std::vector< std::pair<int,std::string> > score_board;
+	for(auto s : username_score)
+		score_board.push_back(std::make_pair(s.second,s.first));
+	
+	std::sort(score_board.begin() , score_board.end() );
+	std::reverse(score_board.begin() , score_board.end()) ;
+	//std::reverse(score_board.begin(), score_board.end()) ;
+	int i  =0 ;
+	for(  auto s = score_board.begin() ; s!= score_board.end()  ; s++)
+	{
+//		std::cout<<"\t\t\t"<<std::string(20,' ')<<(*s).second << " " << (*s).first << std::endl;
+		printf("\t\t\t%20s\t\t%d\n",(*s).second.c_str(),(*s).first);
+		i++;
+	}
+
+	for( ;i<10;i++)
+		printf("\n");
+
+	while( feeds.size() > 10 )
+		feeds.erase(feeds.begin());
+
+	printf("\t\t\t\t       LIVE     FEEDS  \n\n");
+	for( auto s : feeds )
+		std::cout <<"\t\t\t\t"<< s << std::endl;
+	
+	
+
+}
+
 
 
 void createGameServer()
@@ -356,11 +401,13 @@ void createGameServer()
    {
       len = sizeof(cliaddr);
       n = recvfrom(sockfd,mesg,1000,0,(struct sockaddr *)&cliaddr,&len);
-      printf("%s\n",mesg); 
+      //printf("%s\n",mesg); 
      
       int code,temp_score;
       char nme[1000];
       sscanf(mesg,"%d : %s : %d",&code,nme,&temp_score);
+
+      displayLeaderBoard();
       
       if(code == 0 )
 	{
@@ -375,7 +422,10 @@ void createGameServer()
 			usernames.insert(nme);
 			username_score[nme] = 0;
 		//	sprintf(mesg,"Start playing the game\n");
-			printf("%s has joined the game!!!\n",nme);
+			char feed[100];
+			memset(feed,0,sizeof(feed));
+			sprintf(feed,ANSI_COLOR_GREEN "%s has joined the game!!!" ANSI_COLOR_RESET,nme);
+			feeds.push_back(std::string(feed));
 		}
       		sendto(sockfd,mesg,sizeof(mesg),0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
 	}
@@ -388,10 +438,16 @@ void createGameServer()
 
 		if( usernames.find(nme) != usernames.end())	
 		{
-			if(username_score[nme] && temp_score == 0)
-				printf(ANSI_COLOR_RED	"%s has restarted the game" ANSI_COLOR_RESET "\n",nme);
+
+			char feed[100];
+			memset(feed,0,sizeof(feed));
+			if(username_score[nme] && temp_score == 0){
+				sprintf(feed,ANSI_COLOR_RED	"%s has restarted the game" ANSI_COLOR_RESET ,nme);
+				feeds.push_back(std::string(feed));
+			}
+
 			username_score[nme]  = temp_score;
-			printf("%s attained score of %d\n",nme,temp_score);
+			//printf("%s attained score of %d\n",nme,temp_score);
 		}
 		
 			
@@ -556,7 +612,7 @@ int main(int argc, char *argv[]) {
 		if (success) {
 			if( isClient ) uploadScore();
 			drawBoard(board);
-			usleep(150000);
+			usleep(50000);
 			addRandom(board);
 			drawBoard(board);
 			if (gameEnded(board)) {
