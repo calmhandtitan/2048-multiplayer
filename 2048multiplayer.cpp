@@ -51,7 +51,8 @@
 #define SIZE 4
 
 
-uint32_t score=0;
+int  score=0;
+bool ended;
 
 char Gserver[100];
 char name[100];
@@ -83,7 +84,7 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 	int8_t x,y;
 	char color[40], reset[] = "\033[m";
 	printf("\033[H");
-
+	printf("%d\n",ended);
 	printf("2048.cpp %17d pts\n\n",score);
 
 	for (y=0;y<SIZE;y++) {
@@ -252,7 +253,8 @@ int16_t countEmpty(uint16_t board[SIZE][SIZE]) {
 }
 
 bool gameEnded(uint16_t board[SIZE][SIZE]) {
-	bool ended = true;
+
+	bool ended=  true;
 	if (countEmpty(board)>0) return false;
 	if (findPairDown(board)) return false;
 	rotateBoard(board);
@@ -338,17 +340,22 @@ void setBufferedInput(bool enable) {
 */
 
 void displayLeaderBoard()
-{
+{	char color[40], reset[] = "\033[m";
+	
 	system("clear");
+	getColor(4,color,40);
+		
+	
+	
+	printf("\t\t\t\t    %s2048   CONTEST   LEADERBOARD%s\n\n",color,reset);
+	printf("\t\t\t\t         Registered  Users:%d\n\n",(int) username_score.size());
+	
+	
+	getColor(2,color,40);	
 
 	
-	printf("\t\t\t\t   2048   CONTEST   LEADERBOARD\n\n");
-	
-	
-	
-	
 	if(username_score.empty() )
-		printf("\t\t\t\t\tNo active users\n");
+		printf("\t\t\t\t\t  %sNo active users%s\n",color,reset);
 
 	std::vector< std::pair<int,std::string> > score_board;
 	for(auto s : username_score)
@@ -358,7 +365,7 @@ void displayLeaderBoard()
 	std::reverse(score_board.begin() , score_board.end()) ;
 	//std::reverse(score_board.begin(), score_board.end()) ;
 	int i  =0 ;
-	for(  auto s = score_board.begin() ; s!= score_board.end()  ; s++)
+	for(  auto s = score_board.begin() ; s!= score_board.end() && i<10  ; s++)
 	{
 //		std::cout<<"\t\t\t"<<std::string(20,' ')<<(*s).second << " " << (*s).first << std::endl;
 		printf("\t\t\t%20s\t\t%d\n",(*s).second.c_str(),(*s).first);
@@ -370,10 +377,10 @@ void displayLeaderBoard()
 
 	while( feeds.size() > 10 )
 		feeds.erase(feeds.begin());
-
-	printf("\t\t\t\t       LIVE     FEEDS  \n\n");
+	getColor(16,color,40);
+	printf("\t\t\t\t\t  %s LIVE     FEEDS %s \n\n",color,reset);
 	for( auto s : feeds )
-		std::cout <<"\t\t\t\t"<< s << std::endl;
+		std::cout <<"\t\t\t\t\t"<< s << std::endl;
 	
 	
 
@@ -384,6 +391,8 @@ void displayLeaderBoard()
 void createGameServer()
 {
 
+   displayLeaderBoard();
+	
    int sockfd,n;
    struct sockaddr_in servaddr,cliaddr;
    socklen_t len;
@@ -401,13 +410,12 @@ void createGameServer()
    {
       len = sizeof(cliaddr);
       n = recvfrom(sockfd,mesg,1000,0,(struct sockaddr *)&cliaddr,&len);
-      //printf("%s\n",mesg); 
+      printf("%s\n",mesg); 
      
       int code,temp_score;
       char nme[1000];
       sscanf(mesg,"%d : %s : %d",&code,nme,&temp_score);
 
-      displayLeaderBoard();
       
       if(code == 0 )
 	{
@@ -441,21 +449,30 @@ void createGameServer()
 
 			char feed[100];
 			memset(feed,0,sizeof(feed));
-			if(username_score[nme] && temp_score == 0){
-				sprintf(feed,ANSI_COLOR_RED	"%s has restarted the game" ANSI_COLOR_RESET ,nme);
+
+			if(temp_score == -1)
+			{
+				sprintf(feed,ANSI_COLOR_RED "%s game has ended!!!" ANSI_COLOR_RESET,nme);
 				feeds.push_back(std::string(feed));
 			}
 
-			username_score[nme]  = temp_score;
-			//printf("%s attained score of %d\n",nme,temp_score);
+			else if(username_score[nme] && temp_score == 0){
+				sprintf(feed, ANSI_COLOR_BLUE	"%s has restarted the game" ANSI_COLOR_RESET ,nme);
+				feeds.push_back(std::string(feed));
+			}
+			if( temp_score != -1 )
+				username_score[nme]  = temp_score;
 		}
 		
 			
 	}	
 			
 			
+      displayLeaderBoard();
       
    }
+
+
 
 
    exit(EXIT_SUCCESS);
@@ -485,9 +502,15 @@ void uploadScore()
    servaddr.sin_family = AF_INET;
    servaddr.sin_addr.s_addr=inet_addr(Gserver);
    servaddr.sin_port=htons(PORT);
+	
+   
+   std::cout << ended << std::endl;
 
    memset(sendline,0,sizeof(sendline));
-   sprintf(sendline,"%d : %s : %d\n",1,name,score);
+   if( ended || gameEnded(board))
+	sprintf(sendline,"%d : %s : %d\n",1,name,-1);	
+   else
+   	sprintf(sendline,"%d : %s : %d\n",1,name,score);
    sendto(sockfd,sendline,strlen(sendline),0,
              (struct sockaddr *)&servaddr,sizeof(servaddr));
 
@@ -529,6 +552,8 @@ void registerUser(char name[])
 
 // cleaning up after game is finished, terminal characterstics are revived
 void signal_callback_handler(int signum) {
+	ended = true;
+	uploadScore();
         printf("         TERMINATED         \n");
         setBufferedInput(true);
         printf("\033[?25h");
@@ -612,10 +637,11 @@ int main(int argc, char *argv[]) {
 		if (success) {
 			if( isClient ) uploadScore();
 			drawBoard(board);
-			usleep(50000);
+			//usleep(500);
 			addRandom(board);
 			drawBoard(board);
 			if (gameEnded(board)) {
+				uploadScore();
 				printf("         GAME OVER          \n");
 				break;
 			}
