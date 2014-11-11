@@ -44,7 +44,7 @@
 #define ANSI_COLOR_MAGENTA "\x1b[35m"
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
-
+ 
 // just choosing a random port 
 #define PORT 31217
 
@@ -446,6 +446,7 @@ void createGameServer()
 
 		if( usernames.find(nme) != usernames.end())	
 		{
+
 			char feed[100];
 			memset(feed,0,sizeof(feed));
 
